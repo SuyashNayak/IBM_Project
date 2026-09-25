@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer ROI Predictor Pro</title>
+
+    <!-- FontAwesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS Styling -->
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+            --accent: #4facfe;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        /* Glassmorphism Dashboard Container */
+        .dashboard {
+            display: flex;
+            gap: 30px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            max-width: 1000px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .form-section { flex: 2; min-width: 300px; }
+        .info-section { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 20px; }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        h2 i { color: var(--accent); }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+
+        label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        /* Input Fields */
+        input, select {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.4);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+        }
+
+        option { background: #1e3a8a; color: #fff; }
+
+        /* Predict Button */
+        button {
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 30px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        /* Live Metrics Sidebar */
+        .live-metrics {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .live-metrics h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-label { font-size: 0.9rem; color: #94a3b8; }
+        .metric-value { font-size: 1.4rem; font-weight: bold; color: #38bdf8; }
+
+        /* Machine Learning Output Result */
+        .result-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none; /* Hidden until predict is clicked */
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .result-card .roi-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+
+        <!-- Left Side: Input Form -->
+        <div class="form-section">
+            <h2><i class="fa-solid fa-chart-line"></i> Campaign ROI Predictor Pro</h2>
+
+            <form action="/predict" method="POST">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Duration</label>
+                        <select name="duration">
+                            <option value="15">15 Days</option>
+                            <option value="30" selected>30 Days</option>
+                            <option value="45">45 Days</option>
+                            <option value="60">60 Days</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Impressions</label>
+                        <input type="number" id="impressions" name="impressions" value="10000" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Clicks</label>
+                        <input type="number" id="clicks" name="clicks" value="800" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Acquisition Cost ($)</label>
+                        <input type="number" id="cost" step="0.01" name="acquisition_cost" value="1500.0" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Engagement (1-10)</label>
+                        <input type="number" min="1" max="10" name="engagement_score" value="8" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Channel</label>
+                        <select name="channel">
+                            <option value="Google Ads">Google Ads</option>
+                            <option value="YouTube">YouTube</option>
+                            <option value="Instagram" selected>Instagram</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Website">Website</option>
+                            <option value="Email">Email</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Audience</label>
+                        <select name="target_audience">
+                            <option value="Men 18-24">Men 18-24</option>
+                            <option value="Men 25-34">Men 25-34</option>
+                            <option value="Women 18-24" selected>Women 18-24</option>
+                            <option value="Women 35-44">Women 35-44</option>
+                            <option value="All Ages">All Ages</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Segment</label>
+                        <select name="customer_segment">
+                            <option value="Health & Wellness">Health & Wellness</option>
+                            <option value="Fashionistas" selected>Fashionistas</option>
+                            <option value="Foodies">Foodies</option>
+                            <option value="Outdoor Adventurers">Outdoor Adventurers</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit"><i class="fa-solid fa-wand-magic-sparkles"></i> Predict Model ROI</button>
+            </form>
+        </div>
+
+        <!-- Right Side: Sidebar & Results -->
+        <div class="info-section">
+            <div class="live-metrics">
+                <h3><i class="fa-solid fa-satellite-dish"></i> Live Estimates</h3>
+                <div class="metric-row">
+                    <span class="metric-label">Click-Through Rate (CTR)</span>
+                    <span class="metric-value" id="display-ctr">8.00%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Cost Per Click (CPC)</span>
+                    <span class="metric-value" id="display-cpc">$1.88</span>
+                </div>
+            </div>
+
+            <!-- Result Card with specific IDs for JavaScript targeting -->
+            <div class="result-card" id="prediction-card">
+                <h3>Predicted ROI</h3>
+                <div class="roi-value" id="result-box">--</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript for Live Analytics -->
+    <script>
+        const impInput = document.getElementById('impressions');
+        const clickInput = document.getElementById('clicks');
+        const costInput = document.getElementById('cost');
+        const ctrDisplay = document.getElementById('display-ctr');
+        const cpcDisplay = document.getElementById('display-cpc');
+
+        function updateMetrics() {
+            let imp = parseFloat(impInput.value) || 0;
+            let clk = parseFloat(clickInput.value) || 0;
+            let cost = parseFloat(costInput.value) || 0;
+
+            let ctr = imp > 0 ? (clk / imp) * 100 : 0;
+            let cpc = clk > 0 ? cost / clk : 0;
+
+            ctrDisplay.textContent = ctr.toFixed(2) + '%';
+            cpcDisplay.textContent = '$' + cpc.toFixed(2);
+        }
+
+        impInput.addEventListener('input', updateMetrics);
+        clickInput.addEventListener('input', updateMetrics);
+        costInput.addEventListener('input', updateMetrics);
+        updateMetrics();
+    </script>
+
+    <!-- JavaScript for AJAX Form Submission -->
+    <script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Stop page reload
+
+        let formData = new FormData(this);
+        let submitBtn = this.querySelector("button[type='submit']");
+
+        // Optional: show a loading state on the button
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Predicting...';
+
+        fetch("/predict", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reveal the card and insert the data
+            document.getElementById("prediction-card").style.display = "block";
+            document.getElementById("result-box").innerText = data.prediction + "x";
+
+            // Reset button text
+            submitBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Predict Model ROI';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            submitBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Predict Model ROI';
+        });
+    });
+    </script>
+</body>
+</html>
